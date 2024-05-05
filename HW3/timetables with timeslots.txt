@@ -1,0 +1,5 @@
+my first and last name have 15 letters:
+
+lse-f-91 (Topt = 17 slots) and tre-s-92 (Topt = 20 slots)
+
+there was no tre-s-93, so I'm guessing it should be 92
