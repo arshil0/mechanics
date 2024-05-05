@@ -1,3 +1,4 @@
+package mechanics.hw3;
 import java.io.*;
 import java.util.StringTokenizer;
 
@@ -15,7 +16,9 @@ public class CourseArray {
 	
 	public void readClashes(String filename) {
 		try {
+			//File t = new File(filename);
 			BufferedReader file = new BufferedReader(new FileReader(filename));
+
 			StringTokenizer line = new StringTokenizer(file.readLine());
 			int count = line.countTokens(), i, j, k;
 			int index[];
@@ -45,6 +48,7 @@ public class CourseArray {
 			file.close();
 		}
 		catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 	

@@ -1,3 +1,5 @@
+package mechanics.hw3;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -28,7 +30,7 @@ public class TimeTable extends JFrame implements ActionListener {
 		String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:"};
 		field = new JTextField[capField.length];
 		
-		String capButton[] = {"Load", "Start", "Step", "Print", "Exit"};
+		String capButton[] = {"Load", "Start", "Cont" ,"Step", "Print", "Exit"};
 		tool = new JButton[capButton.length];
 		
 		tools.setLayout(new GridLayout(2 * capField.length + capButton.length, 1));
@@ -72,41 +74,60 @@ public class TimeTable extends JFrame implements ActionListener {
 		int min, step, clashes;
 		
 		switch (getButtonIndex((JButton) click.getSource())) {
-		case 0:
-			int slots = Integer.parseInt(field[0].getText());
-			courses = new CourseArray(Integer.parseInt(field[1].getText()) + 1, slots);
-			courses.readClashes(field[2].getText());
-			draw();
-			break;
-		case 1:
-			min = Integer.MAX_VALUE;
-			step = 0;
-			for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
-			
-			for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+			case 0: //load
+				int slots = Integer.parseInt(field[0].getText());
+				courses = new CourseArray(Integer.parseInt(field[1].getText()) + 1, slots);
+				courses.readClashes(field[2].getText());
+				draw();
+				break;
+			case 1: //start
+				min = Integer.MAX_VALUE;
+				step = 0;
+				for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
+
+				for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+					courses.iterate(Integer.parseInt(field[4].getText()));
+					draw();
+					clashes = courses.clashesLeft();
+					if (clashes < min) {
+						min = clashes;
+						step = iteration;
+					}
+				}
+				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
+				setVisible(true);
+				break;
+			case 2: //continue (same as start, without setting the slots to 0)
+				min = Integer.MAX_VALUE;
+				step = 0;
+
+				//don't set the slot to 0
+
+				for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+					courses.iterate(Integer.parseInt(field[4].getText()));
+					draw();
+					clashes = courses.clashesLeft();
+					if (clashes < min) {
+						min = clashes;
+						step = iteration;
+					}
+				}
+				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
+				setVisible(true);
+				break;
+			case 3: //step
 				courses.iterate(Integer.parseInt(field[4].getText()));
 				draw();
-				clashes = courses.clashesLeft();
-				if (clashes < min) {
-					min = clashes;
-					step = iteration;
-				}
-			}
-			System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
-			setVisible(true);
-			break;
-		case 2:
-			courses.iterate(Integer.parseInt(field[4].getText()));
-			draw();
-			break;
-		case 3:
-			System.out.println("Exam\tSlot\tClashes");
-			for (int i = 1; i < courses.length(); i++)
-				System.out.println(i + "\t" + courses.slot(i) + "\t" + courses.status(i));
-			break;
-		case 4:
-			System.exit(0);
+				break;
+			case 4: //print
+				System.out.println("Exam\tSlot\tClashes");
+				for (int i = 1; i < courses.length(); i++)
+					System.out.println(i + "\t" + courses.slot(i) + "\t" + courses.status(i));
+				break;
+			case 5: //exit
+				System.exit(0);
 		}
+
 	}
 
 	public static void main(String[] args) {

@@ -1,3 +1,4 @@
+package mechanics.hw3;
 import java.util.*;
 
 public class Course {
