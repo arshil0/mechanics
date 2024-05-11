@@ -138,14 +138,17 @@ public class TimeTable extends JFrame implements ActionListener {
 						step = iteration;
 					}
 
-					if(Math.random() < 0.35){
+					if(Math.random() < 0.25){
 						int[] neurons = new int[courses.length()];
 						for(int i = 1; i < neurons.length; i++){
-							System.out.println(i);
 							neurons[i] = courses.slot(i);
 						}
 						autoassociator.unitUpdate(neurons);
-						System.out.println("boom!");
+						System.out.println("autoassociation!");
+
+						for(int i = 1; i < neurons.length; i++){
+							courses.setSlot(i, neurons[i]);
+						}
 					}
 				}
 
