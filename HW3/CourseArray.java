@@ -39,7 +39,6 @@ public class CourseArray {
 									k++;
 								if (k == elements[index[i]].clashesWith.size())
 									elements[index[i]].addClash(elements[index[j]]);
-								System.out.println(elements[index[i]].clashesWith);
 							}
 				}
 				line = new StringTokenizer(file.readLine());

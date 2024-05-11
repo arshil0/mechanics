@@ -2,6 +2,9 @@ package mechanics.hw3;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import javax.swing.*;
 
 public class TimeTable extends JFrame implements ActionListener {
@@ -13,6 +16,8 @@ public class TimeTable extends JFrame implements ActionListener {
 	private Color CRScolor[] = {Color.RED, Color.GREEN, Color.BLACK};
 
 	private Autoassociator autoassociator;
+
+	private int globalMin = Integer.MAX_VALUE;
 	
 	public TimeTable() {
 		super("Dynamic Time Table");
@@ -32,7 +37,7 @@ public class TimeTable extends JFrame implements ActionListener {
 		String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:", "TimeSlot"};
 		field = new JTextField[capField.length];
 		
-		String capButton[] = {"Load", "Start", "Cont" ,"Step", "Print", "TSlot", "Exit"};
+		String capButton[] = {"Load", "Start", "Cont", "TStart" ,"Step", "Print", "TSlot", "Train", "Exit"};
 		tool = new JButton[capButton.length];
 		
 		tools.setLayout(new GridLayout(2 * capField.length + capButton.length, 1));
@@ -81,13 +86,12 @@ public class TimeTable extends JFrame implements ActionListener {
 				courses = new CourseArray(Integer.parseInt(field[1].getText()) + 1, slots);
 				courses.readClashes(field[2].getText());
 				draw();
-				//autoassociator = new Autoassociator(courses);
+				autoassociator = new Autoassociator(courses);
 				break;
 			case 1: //start
 				min = Integer.MAX_VALUE;
 				step = 0;
 				for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
-
 				for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
 					courses.iterate(Integer.parseInt(field[4].getText()));
 					draw();
@@ -97,6 +101,8 @@ public class TimeTable extends JFrame implements ActionListener {
 						step = iteration;
 					}
 				}
+
+				globalMin = step;
 				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
 				setVisible(true);
 				break;
@@ -115,14 +121,46 @@ public class TimeTable extends JFrame implements ActionListener {
 						step = iteration;
 					}
 				}
+				globalMin = step;
 				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
 				setVisible(true);
 				break;
-			case 3: //step
+			case 3: //trained start
+				min = Integer.MAX_VALUE;
+				step = 0;
+				for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
+				for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+					courses.iterate(Integer.parseInt(field[4].getText()));
+					draw();
+					clashes = courses.clashesLeft();
+					if (clashes < min) {
+						min = clashes;
+						step = iteration;
+					}
+
+					if(Math.random() < 0.35){
+						int[] neurons = new int[courses.length()];
+						for(int i = 1; i < neurons.length; i++){
+							System.out.println(i);
+							neurons[i] = courses.slot(i);
+						}
+						autoassociator.unitUpdate(neurons);
+						System.out.println("boom!");
+					}
+				}
+
+
+
+
+				globalMin = step;
+				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
+				setVisible(true);
+				break;
+			case 4: //step
 				courses.iterate(Integer.parseInt(field[4].getText()));
 				draw();
 				break;
-			case 4: //print
+			case 5: //print
 				System.out.println("Slot\tclasses\tClashes");
 				for(int slot = 0; slot < Integer.parseInt(field[0].getText()); slot++){
 					int classes = 0;
@@ -139,14 +177,43 @@ public class TimeTable extends JFrame implements ActionListener {
 				}
 
 				break;
-			case 5: //print specific time slot
+			case 6: //print specific time slot
 				int timeSlot = Integer.parseInt(field[5].getText());
+				System.out.println("Slots = " + field[0].getText() + "\t\t" + "Shift = " + field[4].getText() + "\t\t"+ "iteration Index = " + globalMin + "\t\t" + "time slot = " + timeSlot);
 				for (int i = 1; i < courses.length(); i++){
 					if (courses.slot(i) == timeSlot) System.out.print(1 + " ");
 					else System.out.print(-1 + " ");
 				}
+				System.out.println();
 				break;
-			case 6: //exit
+			case 7: //train
+				String filename = field[2].getText().substring(0, field[2].getText().length() - 4) + "-timeslots.txt";
+
+
+				try{
+					BufferedReader data = new BufferedReader(new FileReader(filename));
+					String s = "a";
+					data.readLine();
+					while(s != null){
+						String[] arr = data.readLine().split(" ");
+						s = data.readLine();
+						int pattern[] = new int[arr.length];
+						for(int i = 0; i < arr.length; i++){
+							pattern[i] = Integer.parseInt(arr[i]);
+						}
+						autoassociator.training(pattern);
+					}
+					System.out.println("successfully trained!");
+
+
+
+				}
+				catch (Exception e){
+					System.out.println("you need to load the file first");
+				}
+
+				break;
+			case 8: //exit
 				System.exit(0);
 		}
 

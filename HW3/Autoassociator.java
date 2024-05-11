@@ -21,6 +21,7 @@ public class Autoassociator {
 
 				Course c1 = courses.elements[i];
 				Course c2 = courses.elements[j];
+				if(c1 == null || c2 == null) continue;
 
 				for (int f = 0; f < c1.clashesWith.size(); f++)
 					if(c2 == c1.clashesWith.elementAt(f)){
@@ -67,7 +68,11 @@ public class Autoassociator {
 		}
 		else{
 			int f = -1;
-			while(f == -1) f = trainingSet.get((int) (Math.random() * trainingCapacity))[index];
+			int iteration = 0;
+			while(iteration < 1000 && f == -1){
+				f = trainingSet.get((int) (Math.random() * trainingSet.size()))[index];
+				iteration++;
+			}
 			neurons[index] = f;
 		}
 		//I don't know, just some random stuff for fun
