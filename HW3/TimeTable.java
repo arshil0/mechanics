@@ -11,6 +11,8 @@ public class TimeTable extends JFrame implements ActionListener {
 	private JTextField field[];
 	private CourseArray courses;
 	private Color CRScolor[] = {Color.RED, Color.GREEN, Color.BLACK};
+
+	private Autoassociator autoassociator;
 	
 	public TimeTable() {
 		super("Dynamic Time Table");
@@ -27,10 +29,10 @@ public class TimeTable extends JFrame implements ActionListener {
 	}
 	
 	public void setTools() {
-		String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:"};
+		String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:", "TimeSlot"};
 		field = new JTextField[capField.length];
 		
-		String capButton[] = {"Load", "Start", "Cont" ,"Step", "Print", "Exit"};
+		String capButton[] = {"Load", "Start", "Cont" ,"Step", "Print", "TSlot", "Exit"};
 		tool = new JButton[capButton.length];
 		
 		tools.setLayout(new GridLayout(2 * capField.length + capButton.length, 1));
@@ -79,6 +81,7 @@ public class TimeTable extends JFrame implements ActionListener {
 				courses = new CourseArray(Integer.parseInt(field[1].getText()) + 1, slots);
 				courses.readClashes(field[2].getText());
 				draw();
+				//autoassociator = new Autoassociator(courses);
 				break;
 			case 1: //start
 				min = Integer.MAX_VALUE;
@@ -120,11 +123,30 @@ public class TimeTable extends JFrame implements ActionListener {
 				draw();
 				break;
 			case 4: //print
-				System.out.println("Exam\tSlot\tClashes");
-				for (int i = 1; i < courses.length(); i++)
-					System.out.println(i + "\t" + courses.slot(i) + "\t" + courses.status(i));
+				System.out.println("Slot\tclasses\tClashes");
+				for(int slot = 0; slot < Integer.parseInt(field[0].getText()); slot++){
+					int classes = 0;
+					int clashAmount = 0;
+					for (int i = 1; i < courses.length(); i++){
+
+						if(courses.slot(i) == slot){
+							classes += 1;
+							clashAmount += courses.status(i);
+						}
+					}
+					System.out.println(slot + "\t\t" + classes + "\t\t" + clashAmount + "\t");
+
+				}
+
 				break;
-			case 5: //exit
+			case 5: //print specific time slot
+				int timeSlot = Integer.parseInt(field[5].getText());
+				for (int i = 1; i < courses.length(); i++){
+					if (courses.slot(i) == timeSlot) System.out.print(1 + " ");
+					else System.out.print(-1 + " ");
+				}
+				break;
+			case 6: //exit
 				System.exit(0);
 		}
 

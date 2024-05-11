@@ -4,7 +4,7 @@ import java.util.StringTokenizer;
 
 public class CourseArray {
 
-	private Course elements[];
+	public Course elements[];
 	private int period;
 	
 	public CourseArray(int numOfCourses, int numOfSlots) {
@@ -16,7 +16,6 @@ public class CourseArray {
 	
 	public void readClashes(String filename) {
 		try {
-			//File t = new File(filename);
 			BufferedReader file = new BufferedReader(new FileReader(filename));
 
 			StringTokenizer line = new StringTokenizer(file.readLine());
@@ -40,6 +39,7 @@ public class CourseArray {
 									k++;
 								if (k == elements[index[i]].clashesWith.size())
 									elements[index[i]].addClash(elements[index[j]]);
+								System.out.println(elements[index[i]].clashesWith);
 							}
 				}
 				line = new StringTokenizer(file.readLine());
@@ -93,5 +93,30 @@ public class CourseArray {
 	public void printResult() {
 		for (int i = 1; i < elements.length; i++)
 			System.out.println(i + "\t" + elements[i].mySlot);
+	}
+
+
+	public int[] getTimeSlot(int index){
+		int[] result = new int[elements.length];
+
+		for(int i = 0; i < elements.length; i++){
+			if(elements[i].mySlot == index)
+				result[i] = 1;
+			else result[i] = -1;
+		}
+
+		return result;
+	}
+
+	public int[] getTimeSlotMultiplied(int index){
+		int[] result = new int[elements.length];
+
+		for(int i = 0; i < elements.length; i++){
+			if(elements[i].mySlot == index)
+				result[i] = index;
+			else result[i] = -1;
+		}
+
+		return result;
 	}
 }
