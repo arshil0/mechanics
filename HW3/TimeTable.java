@@ -37,7 +37,7 @@ public class TimeTable extends JFrame implements ActionListener {
 		String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:", "TimeSlot"};
 		field = new JTextField[capField.length];
 		
-		String capButton[] = {"Load", "Start", "Cont", "TStart" ,"Step", "Print", "TSlot", "Train", "Exit"};
+		String capButton[] = {"Load", "Start", "Cont", "TCont" ,"Step", "Print", "TPr", "Train", "Exit"};
 		tool = new JButton[capButton.length];
 		
 		tools.setLayout(new GridLayout(2 * capField.length + capButton.length, 1));
@@ -125,10 +125,9 @@ public class TimeTable extends JFrame implements ActionListener {
 				System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
 				setVisible(true);
 				break;
-			case 3: //trained start
+			case 3: //trained continue
 				min = Integer.MAX_VALUE;
 				step = 0;
-				for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
 				for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
 					courses.iterate(Integer.parseInt(field[4].getText()));
 					draw();
@@ -138,17 +137,18 @@ public class TimeTable extends JFrame implements ActionListener {
 						step = iteration;
 					}
 
-					if(Math.random() < 0.25){
+					if(Math.random() < 0.15){
 						int[] neurons = new int[courses.length()];
 						for(int i = 1; i < neurons.length; i++){
 							neurons[i] = courses.slot(i);
 						}
-						autoassociator.unitUpdate(neurons);
-						System.out.println("autoassociation!");
-
-						for(int i = 1; i < neurons.length; i++){
-							courses.setSlot(i, neurons[i]);
+						int index = autoassociator.unitUpdate(neurons);
+						if(neurons[index] != -1 && courses.elements[index] != null){
+							System.out.println("changed neuron at index " + index + " from " + courses.elements[index].mySlot +" to " + neurons[index]);
+							courses.setSlot(index, neurons[index]);
 						}
+
+
 					}
 				}
 
@@ -180,7 +180,7 @@ public class TimeTable extends JFrame implements ActionListener {
 				}
 
 				break;
-			case 6: //print specific time slot
+			case 6: //print specific time slot (TPr)
 				int timeSlot = Integer.parseInt(field[5].getText());
 				System.out.println("Slots = " + field[0].getText() + "\t\t" + "Shift = " + field[4].getText() + "\t\t"+ "iteration Index = " + globalMin + "\t\t" + "time slot = " + timeSlot);
 				for (int i = 1; i < courses.length(); i++){
@@ -195,14 +195,19 @@ public class TimeTable extends JFrame implements ActionListener {
 
 				try{
 					BufferedReader data = new BufferedReader(new FileReader(filename));
-					String s = "a";
-					data.readLine();
+					String s = data.readLine();
 					while(s != null){
+						int slot = Integer.parseInt(s.substring(s.indexOf("time slot =") + 12));
 						String[] arr = data.readLine().split(" ");
 						s = data.readLine();
 						int pattern[] = new int[arr.length];
 						for(int i = 0; i < arr.length; i++){
-							pattern[i] = Integer.parseInt(arr[i]);
+							if(arr[i].equals("-1")){
+								pattern[i] = Integer.parseInt(arr[i]);
+							}
+							else{
+								pattern[i] = Integer.parseInt(arr[i]) * slot;
+							}
 						}
 						autoassociator.training(pattern);
 					}

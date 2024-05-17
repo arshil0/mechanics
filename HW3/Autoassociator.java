@@ -49,7 +49,7 @@ public class Autoassociator {
 	public int unitUpdate(int neurons[]) {
 		// implements a single update step and
 		// returns the index of the randomly selected and updated neuron
-		int r =(int) (Math.random() * neurons.length);
+		int r =(int) (Math.random() * neurons.length - 1);
 
 		unitUpdate(neurons, r);
 		
@@ -73,6 +73,7 @@ public class Autoassociator {
 				f = trainingSet.get((int) (Math.random() * trainingSet.size()))[index];
 				iteration++;
 			}
+			if(f == -1) return;
 			neurons[index] = f;
 		}
 		//I don't know, just some random stuff for fun
